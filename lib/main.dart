@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'scan.dart';
 import 'db.dart';
 import 'code.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
+import 'show.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,11 +41,21 @@ class _MyHomePageState extends State<MyHomePage> {
   bool edit = false;
   TextEditingController textIssuerController = TextEditingController();
   TextEditingController textAccountController = TextEditingController();
+  bool mode = false; // true 是为当前页面显示动态验证码
 
   @override
   void initState() {
     super.initState();
+    getMode();
     initDb();
+  }
+
+  void getMode() async {
+    var prefs = await SharedPreferences.getInstance();
+    var value = prefs.getBool('mode') ?? false;
+    setState(() {
+      mode = value;
+    });
   }
 
   void initDb() async {
@@ -152,6 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
+              mode ? ShowCodePage(secretKey: item['secretKey']) :
               Icon(
                 Icons.arrow_forward_ios,
                 size: 20.0,
@@ -187,6 +200,17 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: const Color(0xFF2151D1),
         elevation: 0,
         shadowColor: Colors.transparent,
+        leading: IconButton(
+            icon: const Icon(Icons.swap_horiz),
+            color: Colors.white,
+            onPressed: () async {
+              var prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('mode', !mode);
+              setState(() {
+                mode = !mode;
+              });
+            }
+        ),
         actions: [
           IconButton(
               icon: const Icon(Icons.edit_note),
