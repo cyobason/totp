@@ -32,12 +32,7 @@ android {
     }
 
     signingConfigs {
-        lutui {
-            keyAlias 'android'
-            keyPassword 'lutui688'
-            storePassword 'lutui688'
-            storeFile file('D:/codes/flutter/auth/android/android.keystore')
-        }
+        
     }
 
     buildTypes {
